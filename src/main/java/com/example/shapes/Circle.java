@@ -3,25 +3,26 @@ package com.example.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Circle extends Shape {
+public class Circle implements Shape {
 
-    double radius;
+    private final double radius;
+    protected Color color;
 
     public Circle(double radius, Color color) {
-        super(color);
+        this.color = color;
         this.radius = radius;
     }
 
     @Override
-    public void draw(GraphicsContext gr) {
+    public void draw(double x, double y, GraphicsContext gr) {
         gr.setFill(color);
         gr.fillOval(x, y, radius, radius);
         gr.save();
     }
 
     @Override
-    public double area() {
-        return Math.PI * radius * radius;
+    public Color getColor() {
+        return color;
     }
 
 }

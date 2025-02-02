@@ -3,32 +3,33 @@ package com.example.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-class Rectangle extends Shape {
+class Rectangle implements Shape {
 
-    double length;
-    double width;
+    private final double length;
+    private final double width;
+    protected Color color;
 
     public Rectangle(double length, double width, Color color) {
-        super(color);
+        this.color = color;
         this.length = length;
         this.width = width;
     }
 
     @Override
-    double area() {
-        return length * width;
-    }
-
-    @Override
-    public void draw(GraphicsContext gr) {
+    public void draw(double x, double y, GraphicsContext gr) {
         gr.setFill(color);
         gr.fillRect(x, y, length, width);
         gr.save();
     }
 
     @Override
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
     public String toString() {
-        return "Rectangle color is " + super.color + "and area is : " + area();
+        return "Rectangle color is " + color;
     }
 
 }

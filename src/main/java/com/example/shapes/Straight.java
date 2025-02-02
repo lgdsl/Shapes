@@ -3,25 +3,24 @@ package com.example.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Straight extends Shape {
+public class Straight implements Shape {
 
-    double length;
+    protected Color color;
 
-    public Straight(double length, Color color) {
-        super(color);
-        this.length = length;
+    public Straight(Color color) {
+        this.color = color;
     }
 
     @Override
-    double area() {
-        return 0;
-    }
-
-    @Override
-    public void draw(GraphicsContext gc) {
-        gc.setStroke(Color.BLACK);
+    public void draw(double x, double y, GraphicsContext gc) {
+        gc.setStroke(color);
         gc.setLineWidth(5);
-        gc.strokeLine(x, y, x + length, y);
+        gc.strokeLine(x, y, x + 200, y);
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
     }
 
 }

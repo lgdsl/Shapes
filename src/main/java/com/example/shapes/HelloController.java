@@ -2,13 +2,16 @@ package com.example.shapes;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class HelloController {
 
@@ -16,9 +19,16 @@ public class HelloController {
     private Canvas canvas;
 
     @FXML
-    private HBox radioButtonContainer;
+    private FlowPane radioButtonContainer;
 
-    private final Map<Button, Shape> shapeButtonMap = new HashMap<>();
+    @FXML
+    private TextField quantityInput;
+
+    private final Random random = new Random();
+    private final ShapeFactory shapeFactory = new ShapeFactory();
+    private final ToggleGroup shapeToggleGroup = new ToggleGroup();
+    private final Map<RadioButton, Shape> shapeButtonMap = new HashMap<>();
+
 
     public HelloController() {
 
@@ -26,37 +36,49 @@ public class HelloController {
 
     @FXML
     public void initialize() {
-        AddShape(new Straight(120, CreateRandomColor()));
-        AddShape(new Angle(CreateRandomColor()));
-        AddShape(new Triangle(20, 40, 40, CreateRandomColor()));
-        AddShape(new Rectangle(70, 40, CreateRandomColor()));
-        AddShape(new Pentagon(CreateRandomColor()));
-        AddShape(new Circle(50, CreateRandomColor()));
-    }
 
-    private Color CreateRandomColor() {
-        return Color.color(Math.random(), Math.random(), Math.random());
-    }
-
-    private void AddShape(Shape shape) {
-        var butt = new Button(shape.getClass().getSimpleName());
-        butt.setOnMouseClicked(this::onCanvasClick);
-        shapeButtonMap.put(butt, shape);
-        radioButtonContainer.getChildren().add(butt);
     }
 
     @FXML
-    public void onCanvasClick(MouseEvent actionEvent) {
-        var caller = actionEvent.getSource();
-        if (caller == null || !shapeButtonMap.containsKey(caller)) {
-            return;
+    public void onDrawButtonClick() {
+        var quantity = Integer.parseInt(quantityInput.getText());
+        var shape = shapeFactory.createShape(quantity, CreateRandomColor());
+        AddShape(shape);
+    }
+
+    private Color CreateRandomColor() {
+        return Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble());
+    }
+
+    private void AddShape(Shape shape) {
+        if (shape == null) { return; }
+        var radioButton = new RadioButton(shape.getClass().getSimpleName());
+        var shapeColor = shape.getColor();
+        var colorAsRgb = String.format("rgb(%d, %d, %d)",
+                (int) (shapeColor.getRed() * 255),
+                (int) (shapeColor.getGreen() * 255),
+                (int) (shapeColor.getBlue() * 255)
+        );
+        radioButton.setStyle("-fx-text-fill: " + colorAsRgb + ";");
+        radioButton.setToggleGroup(shapeToggleGroup);
+        radioButtonContainer.getChildren().add(radioButton);
+        shapeButtonMap.put(radioButton, shape);
+    }
+
+    public Shape getSelectedShape() {
+        var selectedRadioButton = (RadioButton) shapeToggleGroup.getSelectedToggle();
+        if (selectedRadioButton != null && shapeButtonMap.containsKey(selectedRadioButton)) {
+            return shapeButtonMap.get(selectedRadioButton);
         }
-        var selectedShape = shapeButtonMap.get(caller);
+        return null;
+    }
+
+
+    @FXML
+    public void onCanvasClick(MouseEvent actionEvent) {
+        var selectedShape = getSelectedShape();
         if (selectedShape == null) { return; }
-        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        selectedShape.x = canvas.getWidth() / 2;
-        selectedShape.y = canvas.getHeight() / 2;
-        selectedShape.draw(canvas.getGraphicsContext2D());
+        selectedShape.draw(actionEvent.getX(), actionEvent.getY(), canvas.getGraphicsContext2D());
     }
 
 }

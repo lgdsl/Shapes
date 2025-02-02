@@ -3,30 +3,25 @@ package com.example.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Triangle extends Shape {
+public class Triangle implements Shape {
 
-    private double sideA;
-    private double sideB;
-    private double sideC;
+    private final double sideA;
+    private final double sideB;
+    private final double sideC;
+    protected Color color;
 
     public Triangle(double sideA, double sideB, double sideC, Color color) {
-        super(color);
+        if (sideA + sideB <= sideC || sideA + sideC <= sideB || sideB + sideC <= sideA) {
+            throw new IllegalArgumentException("Sides do not form a valid triangle");
+        }
+        this.color = color;
         this.sideA = sideA;
         this.sideB = sideB;
         this.sideC = sideC;
     }
 
     @Override
-    double area() {
-        var halfPerimeter = (sideA + sideB + sideC) / 2;
-        return Math.sqrt(halfPerimeter * (halfPerimeter - sideA) * (halfPerimeter - sideB) * (halfPerimeter - sideC));
-    }
-
-    @Override
-    void draw(GraphicsContext gr) {
-        if (sideA + sideB <= sideC || sideA + sideC <= sideB || sideB + sideC <= sideA) {
-            throw new IllegalArgumentException("Sides do not form a valid triangle");
-        }
+    public void draw(double x, double y, GraphicsContext gr) {
         var peakX = x + ((sideA * sideA - sideB * sideB) / (2 * sideC)) + sideC / 2;
         var peakY = y - Math.sqrt(Math.max(0, sideA * sideA - Math.pow(peakX - x, 2)));
         gr.setFill(color);
@@ -36,6 +31,11 @@ public class Triangle extends Shape {
                 3
         );
         gr.save();
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
     }
 
 }
