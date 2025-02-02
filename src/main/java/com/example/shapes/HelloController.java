@@ -1,16 +1,15 @@
 package com.example.shapes;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class HelloController {
@@ -19,66 +18,49 @@ public class HelloController {
     private Canvas canvas;
 
     @FXML
-    private FlowPane radioButtonContainer;
+    private ListView<Shape> listview;
 
     @FXML
-    private TextField quantityInput;
+    private ColorPicker colorPicker;
 
+    private ObservableList<Shape> content;
     private final Random random = new Random();
-    private final ShapeFactory shapeFactory = new ShapeFactory();
-    private final ToggleGroup shapeToggleGroup = new ToggleGroup();
-    private final Map<RadioButton, Shape> shapeButtonMap = new HashMap<>();
 
-
-    public HelloController() {
-
-    }
 
     @FXML
     public void initialize() {
+        var straight = new Straight();
+        var angle = new Angle();
+        var triangle = new Triangle(random.nextDouble() * 79, 40, 40);
+        var rectangle = new Rectangle(random.nextDouble() * 50, random.nextDouble() * 80);
+        var pentagon = new Pentagon();
+        var circle = new Circle(random.nextDouble() * 50);
 
-    }
-
-    @FXML
-    public void onDrawButtonClick() {
-        var quantity = Integer.parseInt(quantityInput.getText());
-        var shape = shapeFactory.createShape(quantity, CreateRandomColor());
-        AddShape(shape);
+        content = FXCollections.observableArrayList(straight, angle, triangle, rectangle, pentagon, circle);
+        listview.setItems(content);
+        listview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
     private Color CreateRandomColor() {
         return Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble());
     }
 
-    private void AddShape(Shape shape) {
-        if (shape == null) { return; }
-        var radioButton = new RadioButton(shape.getClass().getSimpleName());
-        var shapeColor = shape.getColor();
-        var colorAsRgb = String.format("rgb(%d, %d, %d)",
-                (int) (shapeColor.getRed() * 255),
-                (int) (shapeColor.getGreen() * 255),
-                (int) (shapeColor.getBlue() * 255)
-        );
-        radioButton.setStyle("-fx-text-fill: " + colorAsRgb + ";");
-        radioButton.setToggleGroup(shapeToggleGroup);
-        radioButtonContainer.getChildren().add(radioButton);
-        shapeButtonMap.put(radioButton, shape);
-    }
-
     public Shape getSelectedShape() {
-        var selectedRadioButton = (RadioButton) shapeToggleGroup.getSelectedToggle();
-        if (selectedRadioButton != null && shapeButtonMap.containsKey(selectedRadioButton)) {
-            return shapeButtonMap.get(selectedRadioButton);
-        }
-        return null;
+        var index = listview.getSelectionModel().getSelectedIndex();
+        var shape = content.get(index).clone();
+        shape.SetColor(colorPicker.getValue());
+        return shape;
     }
 
 
     @FXML
     public void onCanvasClick(MouseEvent actionEvent) {
         var selectedShape = getSelectedShape();
-        if (selectedShape == null) { return; }
-        selectedShape.draw(actionEvent.getX(), actionEvent.getY(), canvas.getGraphicsContext2D());
+        if (selectedShape == null) {
+            return;
+        }
+        selectedShape.SetXY(actionEvent.getX(), actionEvent.getY());
+        selectedShape.draw(canvas.getGraphicsContext2D());
     }
 
 }

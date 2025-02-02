@@ -1,35 +1,27 @@
 package com.example.shapes;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
-class Rectangle implements Shape {
+class Rectangle extends Shape {
 
     private final double length;
     private final double width;
-    protected Color color;
 
-    public Rectangle(double length, double width, Color color) {
-        this.color = color;
+    public Rectangle(double length, double width) {
         this.length = length;
         this.width = width;
     }
 
     @Override
-    public void draw(double x, double y, GraphicsContext gr) {
+    public void draw(GraphicsContext gr) {
         gr.setFill(color);
         gr.fillRect(x, y, length, width);
         gr.save();
     }
 
     @Override
-    public Color getColor() {
-        return color;
-    }
-
-    @Override
     public String toString() {
-        return "Rectangle color is " + color;
+        return "Rectangle";
     }
 
 }

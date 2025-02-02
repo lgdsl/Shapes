@@ -3,10 +3,32 @@ package com.example.shapes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public interface Shape {
+public abstract class Shape implements Cloneable {
 
-    void draw(double x, double y, GraphicsContext gr);
+    protected Color color;
+    protected double x;
+    protected double y;
 
-    Color getColor();
+    abstract void draw(GraphicsContext gr);
+
+    Color getColor() { return color; }
+
+    public void SetColor(Color color) { this.color = color;}
+
+    public void SetXY(double x, double y) { this.x = x; this.y = y; }
+
+    public abstract String toString();
+
+    @Override
+    public Shape clone() {
+        Shape clone = null;
+        try {
+            clone = (Shape) super.clone();
+        } catch (
+                CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+        return clone;
+    }
 
 }
